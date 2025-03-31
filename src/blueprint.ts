@@ -1,4 +1,7 @@
-import { XinBlueprint } from 'xinjs'
+import { XinBlueprint, PartsMap } from 'xinjs'
+import * as BABYLON from '@babylonjs/core'
+import '@babylonjs/gui'
+import '@babylonjs/loaders'
 
 type B3dCallback =
   | ((element: HTMLElement, BABYLON: any) => void)
@@ -10,8 +13,6 @@ interface B3dUIOptions {
   data?: any
   size?: number
 }
-
-type MeshProcessCallback = (meshes: any[]) => void
 
 const noop = () => {
   /* do not care */
@@ -33,13 +34,14 @@ const scriptTag = (url: string, name: string): Promise<any> => {
   return scriptMap[url]
 }
 
-export const b3d: XinBlueprint = (tag, factory) => {
+interface B3dParts extends PartsMap {
+  canvas: HTMLCanvasElement
+}
+
+export const b3d: XinBlueprint<B3dParts> = (tag, factory) => {
   const { Component, elements, vars } = factory
 
-  class B3d extends Component {
-    babylonReady: Promise<any>
-    BABYLON?: any
-
+  class B3d extends Component<B3dParts> {
     static styleSpec = {
       ':host': {
         display: 'block',
@@ -72,11 +74,6 @@ export const b3d: XinBlueprint = (tag, factory) => {
 
     constructor() {
       super()
-
-      this.babylonReady = scriptTag(
-        'https://cdn.babylonjs.com/babylon.js',
-        'BABYLON'
-      )
     }
 
     scene: any
@@ -105,13 +102,10 @@ export const b3d: XinBlueprint = (tag, factory) => {
     loadScene = async (
       path: string,
       file: string,
-      processCallback?: MeshProcessCallback
+      processCallback = (scene: any) => {
+        console.log(scene, 'loaded')
+      }
     ): Promise<void> => {
-      const BABYLON = await scriptTag(
-        'https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js',
-        'BABYLON'
-      )
-
       BABYLON.SceneLoader.Append(path, file, this.scene, processCallback)
     }
 
@@ -156,30 +150,30 @@ export const b3d: XinBlueprint = (tag, factory) => {
       return { advancedTexture, gui, root, widgets }
     }
 
+    private load = async () => {
+      const { canvas } = this.parts
+      this.engine = new BABYLON.Engine(canvas, true)
+      this.scene = new BABYLON.Scene(this.engine)
+      if (this.sceneCreated) {
+        await this.sceneCreated(this, BABYLON)
+      }
+      if (this.scene.activeCamera === undefined) {
+        const camera = new BABYLON.ArcRotateCamera(
+          'default-camera',
+          -Math.PI / 2,
+          Math.PI / 2.5,
+          3,
+          new BABYLON.Vector3(0, 0, 0)
+        )
+        camera.attachControl(this.parts.canvas, true)
+      }
+      this.engine.runRenderLoop(this._update)
+    }
+
     connectedCallback(): void {
       super.connectedCallback()
 
-      const { canvas } = this.parts as { canvas: HTMLCanvasElement }
-
-      this.babylonReady.then(async (BABYLON) => {
-        this.BABYLON = BABYLON
-        this.engine = new BABYLON.Engine(canvas, true)
-        this.scene = new BABYLON.Scene(this.engine)
-        if (this.sceneCreated) {
-          await this.sceneCreated(this, BABYLON)
-        }
-        if (this.scene.activeCamera === undefined) {
-          const camera = new BABYLON.ArcRotateCamera(
-            'default-camera',
-            -Math.PI / 2,
-            Math.PI / 2.5,
-            3,
-            new BABYLON.Vector3(0, 0, 0)
-          )
-          camera.attachControl(this.parts.canvas, true)
-        }
-        this.engine.runRenderLoop(this._update)
-      })
+      this.load()
     }
   }
 

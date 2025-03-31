@@ -21,5 +21,10 @@
     "start": "bun format && bun dev.ts",
     "format": "bun eslint src --fix && bun prettier --write .",
     "make": "bun build ./src/blueprint.ts --outfile=dist/blueprint.js --minify"
+  },
+  "peerDependencies": {
+    "@babylonjs/core": "^8.0.1",
+    "@babylonjs/gui": "^8.0.1",
+    "@babylonjs/loaders": "^8.0.1"
   }
 }
