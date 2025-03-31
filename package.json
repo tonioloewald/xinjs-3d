@@ -1,0 +1,25 @@
+{
+  "name": "xinjs-3d",
+  "version": "0.0.1",
+  "main": "./dist/blueprint.js",
+  "exports": "./dist/blueprint.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tonioloewald/create-xinjs-blueprint.git"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
+    "prettier": "^2.8.8",
+    "xinjs": "^0.8.9",
+    "typescript": "^5.6.2"
+  },
+  "scripts": {
+    "start": "bun format && bun dev.ts",
+    "format": "bun eslint src --fix && bun prettier --write .",
+    "make": "bun build ./src/blueprint.ts --outfile=dist/blueprint.js --minify"
+  }
+}

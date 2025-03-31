@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<title></title>
+<script type="module">
+  import {
+    blueprint,
+    blueprintLoader,
+    elements,
+  } from 'https://cdn.jsdelivr.net/npm/xinjs@0.8.9/dist/module.js'
+  const { protocol, host } = window.location
+  const { h1, div, a, xinTest } = elements
+
+  ;(async () => {
+    const response = await fetch('./package.json')
+    const data = await response.json()
+
+    document.title = data.name
+    const header = document.querySelector('header')
+    header.append(
+      h1(data.name),
+      div(
+        a({ href: data.repository.url }, 'repo'),
+        ' | ',
+        a({ href: `https://www.npmjs.com/package/${data.name}` }, 'npm')
+      )
+    )
+  })()
+
+  // blueprintLoader
+  document.body.append(
+    blueprintLoader(
+      {
+        onload() {
+          const preview = document.querySelector('.preview')
+          preview.append(
+            elements['xinjs-3d']({
+              async sceneCreated(element, BABYLON) {
+                const camera = new BABYLON.FreeCamera(
+                  'camera',
+                  new BABYLON.Vector3(0, 1, -4),
+                  element.scene
+                )
+                camera.attachControl(element.parts.canvas, true)
+
+                new BABYLON.HemisphericLight(
+                  'light',
+                  new BABYLON.Vector3(0.25, 1, -0.5)
+                )
+                this.loadScene('https://ui.xinjs.net/', 'xin3d.glb')
+              },
+            })
+          )
+          const tests = document.querySelector('.tests')
+          tests.append(
+            xinTest({
+              description: 'xinjs-3d registered',
+              test() {
+                return (
+                  document.querySelector('xinjs-3d').constructor !== HTMLElement
+                )
+              },
+            })
+          )
+        },
+      },
+      blueprint({
+        tag: 'xinjs-3d',
+        src:
+          host === 'tonioloewald.github.io'
+            ? // live demo
+              `https://tonioloewald.github.io/create-xinjs-blueprint/dist/blueprint.js`
+            : // local test
+              `${protocol}//${host}/dist/blueprint.js`,
+      }),
+      blueprint({
+        tag: 'xin-test',
+        src: 'https://tonioloewald.github.io/xin-test/dist/blueprint.js',
+      })
+    )
+  )
+</script>
+<link href="style.css" rel="stylesheet" />
+<style>
+  .custom {
+    --toggle-track-height: 24px;
+    --toggle-track-radius: 12px;
+    --toggle-track-inset: -2px;
+    --toggle-knob-size: 20px;
+    --toggle-track-width: 48px;
+    --toggle-track-on-color: limegreen;
+    --toggle-on-color: gray;
+    --toggle-knob-shadow: none;
+  }
+</style>
+<header></header>
+
+<section
+  class="preview"
+  style="display: flex; flex-direction: column"
+></section>
+
+<section class="tests">
+  <h2>Tests</h2>
+</section>
