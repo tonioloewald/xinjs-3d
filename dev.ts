@@ -11,10 +11,10 @@ async function build() {
   console.time('build')
   let output = await $`rm -rf ${DIST_DIR}`.text()
   let result = await Bun.build({
-    entrypoints: ['./src/blueprint.ts'],
+    entrypoints: ['./src/index.ts'],
     outdir: './dist',
     sourcemap: 'linked',
-    // minify: true,
+    minify: true,
   })
   if (!result.success) {
     console.error('Build to /build failed')

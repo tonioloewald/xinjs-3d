@@ -1,12 +1,12 @@
 {
   "name": "xinjs-3d",
   "version": "0.0.1",
-  "main": "./dist/blueprint.js",
-  "exports": "./dist/blueprint.js",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tonioloewald/create-xinjs-blueprint.git"
+    "url": "https://github.com/tonioloewald/xinjs-3d.git"
   },
   "devDependencies": {
     "@types/bun": "latest",
