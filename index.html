@@ -28,6 +28,13 @@
       )
     })()
 
+    const xinjs3dsrc =
+      host === 'tonioloewald.github.io'
+        ? // live demo
+          `https://tonioloewald.github.io/xinjs-3d/dist/index.js`
+        : // local test
+          `${protocol}//${host}/dist/index.js`
+
     // blueprintLoader
     document.body.append(
       blueprintLoader(
@@ -37,18 +44,26 @@
             preview.append(
               elements['xin-b3d']({
                 async sceneCreated(element, BABYLON) {
+                  const { scene } = element
                   const camera = new BABYLON.FreeCamera(
                     'camera',
                     new BABYLON.Vector3(0, 1, -4),
-                    element.scene
+                    scene
                   )
                   camera.attachControl(element.parts.canvas, true)
 
-                  new BABYLON.HemisphericLight(
-                    'light',
-                    new BABYLON.Vector3(0.25, 1, -0.5)
-                  )
-                  this.loadScene('https://ui.xinjs.net/', 'xin3d.glb')
+                  this.loadScene('./', 'xin3d.glb', async (imported) => {
+                    // for some reason this doesn't play automatically
+                    imported.getAnimationGroupByName('Cube.001').play()
+
+                    for (const light of imported.lights) {
+                      if (light instanceof BABYLON.DirectionalLight) {
+                        light.intensity *= 0.002
+                      } else {
+                        light.intensity *= 0.005
+                      }
+                    }
+                  })
                 },
               })
             )
@@ -69,12 +84,7 @@
         blueprint({
           tag: 'xin-b3d',
           property: 'b3d',
-          src:
-            host === 'tonioloewald.github.io'
-              ? // live demo
-                `https://tonioloewald.github.io/xinjs-3d/dist/index.js`
-              : // local test
-                `${protocol}//${host}/dist/index.js`,
+          src: xinjs3dsrc,
         }),
         blueprint({
           tag: 'xin-test',
