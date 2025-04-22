@@ -52,8 +52,13 @@
                   )
                   camera.attachControl(element.parts.canvas, true)
 
+                  const { initializeDynamicShadows } = await import(xinjs3dsrc)
+
+                  initializeDynamicShadows(scene)
+
                   this.loadScene('./', 'xin3d.glb', async (imported) => {
                     // for some reason this doesn't play automatically
+                    imported.getAnimationGroupByName('Cube.001').loopAnimation = true
                     imported.getAnimationGroupByName('Cube.001').play()
 
                     for (const light of imported.lights) {
