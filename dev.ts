@@ -63,14 +63,7 @@ const server = Bun.serve({
     })
     if (publicResponse) return publicResponse
 
-    // check /.build
-    const buildResponse = serveFromDir({
-      directory: PROJECT_ROOT,
-      path: reqPath,
-    })
-    if (buildResponse) return buildResponse
-
-    if (isSPA) {
+    if (isSPA && reqPath !== '/favicon.ico') {
       const spaResponse = serveFromDir({
         directory: PROJECT_ROOT,
         path: '/index.html',
@@ -78,6 +71,7 @@ const server = Bun.serve({
       console.log(spaResponse)
       if (spaResponse) return spaResponse
     }
+    console.log(reqPath, 'not found')
     return new Response('File not found', {
       status: 404,
     })
