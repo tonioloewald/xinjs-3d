@@ -52,14 +52,17 @@
                   )
                   camera.attachControl(element.parts.canvas, true)
 
-                  const { initializeDynamicShadows } = await import(xinjs3dsrc)
+                  const { initializeDynamicShadows, initializeReflections } =
+                    await import(xinjs3dsrc)
 
                   initializeDynamicShadows(scene)
+                  initializeReflections(scene)
 
                   this.loadScene('./', 'xin3d.glb', async (imported) => {
                     // for some reason this doesn't play automatically
-                    imported.getAnimationGroupByName('Cube.001').loopAnimation = true
-                    imported.getAnimationGroupByName('Cube.001').play()
+                    const cubeSpin =
+                      imported.getAnimationGroupByName('cube_spin')
+                    cubeSpin.play(true)
 
                     for (const light of imported.lights) {
                       if (light instanceof BABYLON.DirectionalLight) {

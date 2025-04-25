@@ -1,7 +1,6 @@
 import {
   Scene,
   Light,
-  Mesh,
   ShadowGenerator,
   DirectionalLight,
   SpotLight,
